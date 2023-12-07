@@ -1,0 +1,24 @@
+{
+  "name": "jest-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@swc-node/register": "^1.6.8",
+    "@swc/jest": "^0.2.29",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.4",
+    "esbuild": "^0.19.8",
+    "esbuild-jest": "^0.5.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.3"
+  }
+}

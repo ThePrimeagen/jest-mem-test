@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+for i in {1..25}; do
+
+    npx jest --config jest.swc.config.js ts &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > swc_js_ts_$1
+
+    npx jest --config jest.esbuild.config.js ts &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > esbuild_js_ts_$1
+
+    npx jest --config jest.ts-node.config.js ts &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > ts-node_js_ts_$1
+
+    npx jest --config jest.swc.config.ts ts &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > swc_ts_ts_$1
+
+    npx jest --config jest.esbuild.config.ts ts &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > esbuild_ts_ts_$1
+
+    npx jest --config jest.ts-node.config.ts ts &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > ts-node_ts_ts_$1
+
+    npx jest --config jest.swc.config.js js &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > swc_js_js_$1
+
+    npx jest --config jest.esbuild.config.js js &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > esbuild_js_js_$1
+
+    npx jest --config jest.ts-node.config.js js &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > ts-node_js_js_$1
+
+    npx jest --config jest.swc.config.ts js &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > swc_ts_js_$1
+
+    npx jest --config jest.esbuild.config.ts js &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > esbuild_ts_js_$1
+
+    npx jest --config jest.ts-node.config.ts js &
+    VMRSS_MONITOR=1 ~/personal/vmrss/vmrss $! > ts-node_ts_js_$1
+done
+
+

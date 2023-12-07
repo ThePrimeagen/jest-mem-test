@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+
+try {
+fs.rmdirSync("js", { recursive: true, force: true });
+} catch (e) { }
+fs.mkdirSync("js");
+fs.mkdirSync("js/__tests__");
+
+try {
+fs.rmdirSync("ts", { recursive: true, force: true });
+} catch (e) { }
+fs.mkdirSync("ts");
+fs.mkdirSync("ts/__tests__");
+
+const count = +process.argv[2] || 10;
+
+const TEST_STR_TS = `
+import { index } from "../../src/index"
+
+describe("index", () => {
+    it("should return hello world", () => {
+        const start = Date.now();
+        while (Date.now() - start < 40000) {
+            // do nothing
+        }
+
+        index([1, 2]);
+        expect(1).toBe(1);
+    });
+});
+`;
+
+const TEST_STR_JS = `
+const { index } = require("../../src/index")
+
+describe("index", () => {
+    it("should return hello world", () => {
+        const start = Date.now();
+        while (Date.now() - start < 40000) {
+            // do nothing
+        }
+
+        index([1, 2]);
+        expect(1).toBe(1);
+    });
+});
+`;
+
+
+for (let i = 0; i < count; i++) {
+    fs.writeFileSync(`ts/__tests__/test_${i}_spec.ts`, TEST_STR_TS);
+    fs.writeFileSync(`js/__tests__/test_${i}_spec.js`, TEST_STR_JS);
+}
+

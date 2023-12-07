@@ -1,0 +1,145 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+const r = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const count = +process.argv[2] || 10;
+
+/** @param {number} len */
+/** @returns {string} */
+function createRandomFileName(len) {
+    let s = "";
+    for (let i = 0; i < len; i++) {
+        s += r[Math.floor(Math.random() * r.length)];
+    }
+    return s;
+}
+
+function makeDirectory(path) {
+    try {
+        fs.mkdirSync(path);
+    } catch(e) { }
+}
+
+const directories = new Array(4).fill(0).map(() => createRandomFileName(8));
+const baseDirectory = "src";
+const files = new Array(count).fill(0).map(() => createRandomFileName(8) + ".ts");
+
+makeDirectory(baseDirectory);
+for (const dir of directories) {
+    makeDirectory(path.join(baseDirectory, dir));
+}
+
+const FUNCTION = `
+function bar(c: string): string {
+    const foo = c.split("").reduce<string>((a, b) => a + b, "");
+    return foo + c;
+}
+
+type Baz = {
+    value: string;
+    outValue: number;
+}
+
+function baz(b: Baz): number {
+    b.outValue = b.value.length;
+    return b.outValue;
+}
+
+export function __NAME__(arr: number[], opt: string = ""): number[] {
+    // Example operation: Add index to each element
+    for (let i = 0; i < arr.length; i++) {
+        const foo: string = bar("foo")
+        const bazValue: Baz = { value: foo, outValue: 0 };
+        arr[i] += i + baz(bazValue);
+    }
+
+    return __DEPS__;
+}
+`;
+
+function createRelativePath(from, to, toName) {
+    const p = path.relative(from, to);
+    console.log("relativePath", p);
+    if (p === "") {
+        return "./" + toName;
+    } else if (p.startsWith("./")) {
+        return p + "/" + toName;
+    }
+    return "./" + p + "/" + toName;
+}
+
+const IMPORT = `import { __NAME__ } from "__PATH__";`;
+const EXPORT_IMPORT = `export { __NAME__ } from "./__NAME__";`;
+
+/** @typedef {{path: string, name: string}} FileInfo */
+
+class File {
+    /** @type {FileInfo[]} */
+    deps = [];
+
+    /** @type {FileInfo} */
+    info;
+
+    /** @param {FileInfo} info */
+    constructor(info) {
+        this.info = info
+    }
+
+    /** @type {FileInfo} */
+    addDep(info) {
+        this.deps.push(info);
+    }
+
+    toString() {
+        let out = "";
+        let calls = "";
+
+        for (const dep of this.deps) {
+            const name = dep.name.replace(/\.ts$/, "");
+            const p = createRelativePath(this.info.path, dep.path, name);
+
+            console.log(this.info.name, "->", p);
+            out += IMPORT
+                .replace(/__NAME__/g, name)
+                .replace(/__PATH__/g, p) + "\n";
+
+            calls += name + "(";
+        }
+
+        calls += "arr" + ")".repeat(this.deps.length);
+
+        const name = this.info.name.replace(/\.ts$/, "");
+        out += FUNCTION
+            .replace(/__NAME__/g, name)
+            .replace(/__DEPS__/g, calls) + "\n";
+
+        return out;
+    }
+}
+
+const baseFile = new File({ path: baseDirectory, name: "index.ts" });
+const q = [baseFile];
+
+while (q.length > 0) {
+    const depCount = Math.floor(Math.random() * 4) + 1;
+    const curr = q.pop();
+
+    for (let i = 0; i < depCount && files.length; ++i) {
+        const file = files.pop();
+        const dir = path.join(baseDirectory, directories[Math.floor(Math.random() * directories.length)]);
+        const info = { path: dir, name: file };
+        const f = new File(info);
+
+        console.log("Adding", dir, info.name, "to", curr.info.name);
+
+        q.push(f);
+
+        curr.addDep(info);
+    }
+
+    console.log("Writing", curr.info.path, curr.info.name);
+    fs.writeFileSync(path.join(curr.info.path, curr.info.name), curr.toString());
+}
+
