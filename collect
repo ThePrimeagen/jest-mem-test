@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+count=25
+if [ ! -z $1 ]; then
+    count=$1
+fi
+vmrss=~/personal/vmrss/vmrss
+if [ ! -z $VMRSS ]; then
+    vmrss=$VMRSS
+fi
+
+echo $vmrss
+tsc
+
+rm -rf processed/data
+mkdir -p processed/data
+
+for i in {1..$count}; do
+    echo "Test $i"
+
+    npx jest --config jest.swc.config.js $(pwd)/ts/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/swc_js_ts_ts_$i
+
+    npx jest --config jest.esbuild.config.js $(pwd)/ts/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/esbuild_js_ts_ts_$i
+
+    npx jest --config jest.ts-node.config.js $(pwd)/ts/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/ts-node_js_ts_ts_$i
+
+    npx jest --config jest.swc.config.ts $(pwd)/ts/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/swc_ts_ts_ts_$i
+
+    npx jest --config jest.esbuild.config.ts $(pwd)/ts/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/esbuild_ts_ts_ts_$i
+
+    npx jest --config jest.ts-node.config.ts $(pwd)/ts/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/ts-node_ts_ts_ts_$i
+
+    npx jest --config jest.swc.config.js $(pwd)/js/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/swc_js_js_ts_$i
+
+    npx jest --config jest.esbuild.config.js $(pwd)/js/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/esbuild_js_js_ts_$i
+
+    npx jest --config jest.ts-node.config.js $(pwd)/js/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/ts-node_js_js_ts_$i
+
+    npx jest --config jest.swc.config.ts $(pwd)/js/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/swc_ts_js_ts_$i
+
+    npx jest --config jest.esbuild.config.ts $(pwd)/js/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/esbuild_ts_js_ts_$i
+
+    npx jest --config jest.ts-node.config.ts $(pwd)/js/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/ts-node_ts_js_ts_$i
+
+    npx jest --config jest.no-ts.config.js $(pwd)/build/ts/__tests__ > /dev/null &
+    VMRSS_MONITOR=1 $vmrss $! > processed/data/no-ts_js_js_js_$i
+done
+
+

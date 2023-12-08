@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+
+import os
+import csv
+import re
+
+def extract_memory_value(line):
+    """Extracts the memory value from a line."""
+    match = re.search(r'Total:\s+(\d+\.\d+)', line)
+    return float(match.group(1)) if match else None
+
+def process_directory_to_csv(input_dir, output_csv):
+    data = {}
+    max_length = 0
+
+    # Process each file in the directory
+    for file_name in os.listdir(input_dir):
+        with open(os.path.join(input_dir, file_name), 'r') as file:
+            values = [extract_memory_value(line) for line in file if extract_memory_value(line) is not None]
+            if len(values) > max_length:
+                max_length = len(values)
+            data[file_name] = values
+
+    # Write to CSV
+    with open(output_csv, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(data.keys())  # Headers
+
+        for i in range(max_length):
+            row = [data[name][i] if i < len(data[name]) else "" for name in data]
+            writer.writerow(row)
+
+# Example usage
+import sys
+input_directory = sys.argv[1]  # First argument is the input directory
+output_csv_file = sys.argv[2]  # Second argument is the output CSV file
+
+process_directory_to_csv(input_directory, output_csv_file)
+
+

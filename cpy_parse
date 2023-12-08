@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Replace these with your actual directory paths
+SOURCE_DIR="$1"
+DEST_DIR="$2"
+
+# Create the new directory
+mkdir -p "$DEST_DIR"
+
+# Loop through each file in the source directory
+for file in "$SOURCE_DIR"/*
+do
+    # Extract only lines containing 'Total' and write them to a new file in the destination directory
+    cat $file | grep 'Total' | grep -v " 0 MB" > "$DEST_DIR/$(basename "$file")"
+done
+
+echo "Files have been processed and saved in $DEST_DIR"
+
+

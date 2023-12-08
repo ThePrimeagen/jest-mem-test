@@ -2,3 +2,6 @@
 /src/
 /js/
 /ts/
+/build/
+/processed/
+/data/

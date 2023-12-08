@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def plot_csv_data(csv_file_path):
+    # Read the CSV file into a DataFrame
+    df = pd.read_csv(csv_file_path)
+
+    # Plotting each column as a separate line
+    plt.figure(figsize=(12, 6))
+    for column in df.columns:
+        plt.plot(df[column], label=column)
+
+    # Adding labels and title
+    plt.xlabel('Index')
+    plt.ylabel('Values')
+    plt.title('Line Plot of CSV Data')
+    plt.legend()
+    plt.grid(True)
+
+    # Show the plot
+    plt.show()
+
+# Replace with the actual path to your CSV file
+import sys
+csv_file_path = sys.argv[1]
+plot_csv_data(csv_file_path)
+
